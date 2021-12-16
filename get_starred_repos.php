@@ -12,53 +12,43 @@ $userInput = $argv[1];
 
 // TODO Create an instance of the GithubService, passing it an instance of \Github\Client via dependency injection
 
-// for example your user
+// GitHub user
 $user = $userInput;
 
-// A token that you could generate from your own github 
-// go here https://github.com/settings/applications and create a token
-// then replace the next string
-$token = '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';
+// curl URL
+$curl_url = "https://api.github.com/users/". $user ."/starred";
 
-// We generate the url for curl
-$curl_url = 'https://api.github.com/users/' . $user . '/starred';
-
-// We generate the header part for the token
-$curl_token_auth = 'Authorization: token ' . $token;
-
-// We make the actuall curl initialization
+// curl
 $ch = curl_init($curl_url);
-
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-// We set the right headers: any user agent type, and then the custom token header part that we generated
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Awesome-Octocat-App', $curl_token_auth));
+// Set headers
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: CAP-Project'));
 
-// We execute the curl
+// Execute the curl
 $output = curl_exec($ch);
-//echo $output;
-// And we make sure we close the curl       
+
+// Close curl       
 curl_close($ch);
 
-// Then we decode the output and we could do whatever we want with it
+// Decode output
 $output = json_decode($output);
 $total = 0;
-if (!empty($output)) {
-  // now you could just foreach the repos and show them
-  echo "\t\n \r\n Below is a list of all starred repos of $user  as at " .  date('Y-m-d') . "\r\n"  ;
 
+//Condition for display or result
+if (!empty($output)) {
+ echo "\t\n \r\n Below is a list of all starred repos of $user  as at " .  date('Y-m-d') . "\r\n"  ;
+// List of starred repos
   foreach ($output as $repo) {
    $total = $total+1;
-   print "\n" ."(" . $total . ") " . $repo->name  . ' => ' . $repo->created_at . "\n";
-  }
-  echo  "\n". "Total starred repositories is $total" . "\n" . "\n";
+ print "\n" ."(" . $total . ") REPOSITORY NAME: " . $repo->name  . '     =>   DATE: ' . $repo->created_at . "\n";
+ }
+ echo  "\n". "Total starred repositories is $total" . "\n" . "\n";
 } else {
 
   // TODO get the results back from the countStarredReposForUser method and output the results onto the screen
- echo "NO STARRED REPOS AT THIS TIME \r\n";
 
+// Display if result is empty
+
+echo " \r\n \r\n The user '" . $user ."' does not exist on GitHub or has no starred repositories at this time \r\n \r\n";
 }
-
-
-
-
